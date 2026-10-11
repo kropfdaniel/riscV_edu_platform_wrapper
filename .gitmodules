@@ -1,0 +1,3 @@
+[submodule "riscV_edu_platform"]
+	path = riscV_edu_platform
+	url = git@github.com:kropfdaniel/riscV_edu_platform.git
