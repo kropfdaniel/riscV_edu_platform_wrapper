@@ -1,6 +1,24 @@
 #!/usr/bin/env fish
 
 # ==============================================================================
+# File: run_formal_equiv_check.fish
+# Author: Daniel Kropf
+# License: MIT License
+# 
+# Description: The main test runner and orchestrator. It automatically transitions
+#              execution into the Docker container and defines the test suites. 
+#              It uses loops to exhaustively test different generic configurations
+#              and logs all results to the build_output directory.
+#
+# Usage: 
+#   ./run_formal_equiv_check.fish [suite_name]
+#
+# Arguments:
+#   all                 (Default) Runs all defined test suites.
+#   <suite_name>        Runs a specific test suite (e.g., immdec).
+# ==============================================================================
+
+# ==============================================================================
 # 1. Docker Auto-Execution (Host Machine)
 # ==============================================================================
 # If the IN_DOCKER variable is not set, we are on the host. 

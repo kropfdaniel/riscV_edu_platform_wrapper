@@ -1,5 +1,29 @@
 #!/usr/bin/env fish
 
+# ==============================================================================
+# File: check_equiv.fish
+# Author: Daniel Kropf
+# License: MIT License
+# 
+# Description: This script transpiles VHDL to Verilog via GHDL and formally verifies equivalence 
+#              against a golden Verilog model using Yosys.
+# Required Arguments:
+#   -n, --name          Unique name for the test run (used for the build folder).
+#   -t, --top           Top-level entity/module name to verify.
+#   --vhdl              Path(s) to the VHDL source files (can specify multiple).
+#   --verilog           Path(s) to the golden Verilog source files (can specify multiple).
+#
+# Optional Arguments:
+#   --generic           Set VHDL generics and Verilog parameters (Format: NAME=VALUE).
+#                       Can specify multiple times (e.g., --generic "W=1" --generic "SHARED=true").
+#   --sat_cycles        Number of cycles for the Yosys SAT solver to prove (Default: 12).
+#   --v_include         Include directory for Verilog headers.
+#   --blackbox          Verilog file containing stub modules to blackbox.
+#   --reset_constraints Additional Yosys script commands for custom clock/reset setups.
+#
+# Note: This script is based on the orginal work of Pascal Gesell
+# ==============================================================================
+
 # Parse named arguments
 argparse 'n/name=' 't/top=' 'vhdl=+' 'verilog=+' 'reset_constraints=' \
          'v_include=' 'blackbox=' 'sat_cycles=' 'generic=+' -- $argv
@@ -11,14 +35,10 @@ if not set -q build_dir; or not set -q results_file
     return 1
 end
 
-# Auto-infer top module from the first VHDL file if not provided
-if not set -q _flag_top
-    set _flag_top (basename $_flag_vhdl[1] .vhd)
-end
-
-# Auto-infer test name from top module if not provided
-if not set -q _flag_name
-    set _flag_name $_flag_top
+# Ensure mandatory parameters are provided
+if not set -q _flag_top; or not set -q _flag_name
+    echo "Error: Both --top and --name arguments must be provided."
+    return 1
 end
 
 # Set defaults

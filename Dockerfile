@@ -1,3 +1,14 @@
+# ==============================================================================
+# File: Dockerfile
+# Author: Daniel Kropf
+# License: MIT License
+# 
+# Description: Defines the containerized verification environment. It builds a 
+#              lightweight Debian image and installs the OSS CAD Suite (Yosys, 
+#              GHDL) along with the Fish shell to ensure a portable, consistent 
+#              toolchain for formal equivalence checking.
+# ==============================================================================
+
 FROM debian:bookworm-slim
 
 # Install fish and curl (needed to download the suite)
