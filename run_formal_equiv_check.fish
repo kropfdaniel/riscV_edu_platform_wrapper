@@ -77,6 +77,15 @@ function test_compdec
         --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_compdec.v
 end
 
+function test_aligner
+    echo "--- Running Aligner Suite ---"
+    check_equiv \
+        --name "serv_aligner" \
+        --top "serv_aligner" \
+        --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_aligner.vhdl \
+        --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_aligner.v
+end
+
 # ==============================================================================
 # 4. Argument Parsing & Execution
 # ==============================================================================
@@ -94,12 +103,15 @@ switch $suite
         test_immdec
     case "compdec"
         test_compdec
+    case "aligner"
+        test_aligner
     case "all"
         test_immdec
         test_compdec
+        test_aligner
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec"
+        echo "Available suites: all, immdec, compdec, aligner"
         exit 1
 end
 
