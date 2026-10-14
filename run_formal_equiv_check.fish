@@ -68,6 +68,15 @@ function test_immdec
     end
 end
 
+function test_compdec
+    echo "--- Running CompDec Suite ---"
+    check_equiv \
+        --name "serv_compdec" \
+        --top "serv_compdec" \
+        --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_compdec.vhdl \
+        --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_compdec.v
+end
+
 # ==============================================================================
 # 4. Argument Parsing & Execution
 # ==============================================================================
@@ -83,11 +92,14 @@ echo "=== Starting Formal Verification ($suite) ==="
 switch $suite
     case "immdec"
         test_immdec
+    case "compdec"
+        test_compdec
     case "all"
         test_immdec
+        test_compdec
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec"
+        echo "Available suites: all, immdec, compdec"
         exit 1
 end
 
