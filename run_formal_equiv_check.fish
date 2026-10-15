@@ -149,6 +149,24 @@ function test_bufreg
     end
 end
 
+function test_bufreg2
+    echo "--- Running BufReg2 Suite ---"
+
+    for W in 1 4
+        # Create a unique name for this specific combination
+        set -l test_name "serv_bufreg2_W_"$W
+        echo "-> Testing configuration: $test_name"
+        
+        check_equiv \
+            --name "$test_name" \
+            --top "serv_bufreg2" \
+            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_bufreg2.vhdl \
+            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_bufreg2.v \
+            --generic "W=$W" \
+            --strict
+    end
+end
+
 # ==============================================================================
 # 4. Argument Parsing & Execution
 # ==============================================================================
@@ -174,6 +192,8 @@ switch $suite
         test_alu
     case "bufreg"
         test_bufreg
+    case "bufreg2"
+        test_bufreg2
     case "all"
         test_immdec
         test_compdec
@@ -181,9 +201,10 @@ switch $suite
         test_decode
         test_alu
         test_bufreg
+        test_bufreg2
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg"
+        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2"
         exit 1
 end
 
