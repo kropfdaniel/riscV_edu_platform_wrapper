@@ -63,7 +63,8 @@ function test_immdec
                 --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_immdec.vhdl \
                 --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_immdec.v \
                 --generic "SHARED_RFADDR_IMM_REGS=$shared" \
-                --generic "W=$w"
+                --generic "W=$w"  \
+                --strict
         end
     end
 end
@@ -74,7 +75,8 @@ function test_compdec
         --name "serv_compdec" \
         --top "serv_compdec" \
         --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_compdec.vhdl \
-        --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_compdec.v
+        --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_compdec.v  \
+        --strict
 end
 
 function test_aligner
@@ -83,7 +85,8 @@ function test_aligner
         --name "serv_aligner" \
         --top "serv_aligner" \
         --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_aligner.vhdl \
-        --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_aligner.v
+        --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_aligner.v  \
+        --strict
 end
 
 function test_decode
@@ -101,7 +104,47 @@ function test_decode
                 --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_decode.vhdl \
                 --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_decode.v \
                 --generic "PRE_REGISTER=$pre_register" \
-                --generic "MDU=$mdu"
+                --generic "MDU=$mdu" \
+                --strict
+        end
+    end
+end
+
+function test_alu
+    echo "--- Running ALU Suite ---"
+
+    for W in 1 2 4 32
+        # Create a unique name for this specific combination
+        set -l test_name "serv_alu_W_"$W
+        echo "-> Testing configuration: $test_name"
+        
+        check_equiv \
+            --name "$test_name" \
+            --top "serv_alu" \
+            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_alu.vhdl \
+            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_alu.v \
+            --generic "W=$W" \
+            --strict
+    end
+end
+
+function test_bufreg
+    echo "--- Running BufReg Suite ---"
+
+    for mdu in true false
+        for W in 1 4
+            # Create a unique name for this specific combination
+            set -l test_name "serv_bufreg_mdu_"$mdu"_w_"$W
+            echo "-> Testing configuration: $test_name"
+            
+            check_equiv \
+                --name "$test_name" \
+                --top "serv_bufreg" \
+                --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_bufreg.vhdl \
+                --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_bufreg.v \
+                --generic "MDU=$mdu" \
+                --generic "W=$W" \
+                --strict
         end
     end
 end
@@ -127,14 +170,20 @@ switch $suite
         test_aligner
     case "decode"
         test_decode
+    case "alu"
+        test_alu
+    case "bufreg"
+        test_bufreg
     case "all"
         test_immdec
         test_compdec
         test_aligner
         test_decode
+        test_alu
+        test_bufreg
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec, aligner, decode"
+        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg"
         exit 1
 end
 

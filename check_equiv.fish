@@ -26,7 +26,7 @@
 
 # Parse named arguments
 argparse 'n/name=' 't/top=' 'vhdl=+' 'verilog=+' 'reset_constraints=' \
-         'v_include=' 'blackbox=' 'sat_cycles=' 'generic=+' -- $argv
+         'v_include=' 'blackbox=' 'sat_cycles=' 'generic=+' 'strict' -- $argv
 or return 1
 
 # Assert global output variables exist
@@ -70,17 +70,29 @@ if set -q _flag_v_include
     set verilog_include "-I$_flag_v_include"
 end
 
+set -l vhdl_flags --synth --std=08
+if set -q _flag_strict
+    set -a vhdl_flags -Wall
+end
+
 mkdir -p "$build_dir/$_flag_name" $work_dir
 printf '\n=== %s (reset-constrained assertions) ===\n' $_flag_name | tee $log_file
 
 # Step 1: Synthesize VHDL to Verilog using GHDL
-if not ghdl --synth --std=08 --out=verilog --workdir=$work_dir $vhdl_generic_args $_flag_vhdl -e $_flag_top >$silver_file 2>>$log_file
+if not ghdl $vhdl_flags --out=verilog --workdir=$work_dir $vhdl_generic_args $_flag_vhdl -e $_flag_top >$silver_file 2>>$log_file
     printf '%s,ghdl-synth-failed\n' $_flag_name >> $results_file
     printf 'GHDL synthesis failed: %s\n' $_flag_name | tee -a $log_file
 
     echo "--- GHDL ERROR LOG ---"
     cat $log_file
     echo "----------------------"
+    return 1
+end
+
+# Catch warnings from GHDL synthesis
+if set -q _flag_strict; and grep -qi 'warning:' $log_file
+    printf '%s,strict-warnings-found\n' $_flag_name >> $results_file
+    printf 'Strict mode failed (Warnings found): %s\n' $_flag_name | tee -a $log_file
     return 1
 end
 
