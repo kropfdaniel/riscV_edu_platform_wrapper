@@ -102,8 +102,9 @@ set -l yosys_script "
     proc; memory; async2sync
     equiv_make -make_assert gold silver equiv
     prep -top equiv
-    flatten; async2sync; opt
-    sat $sat_options -seq $_flag_sat_cycles -verify -prove-asserts -set-init-zero $_flag_reset_constraints
+    flatten; async2sync; opt -keepdc
+    sat $sat_options -seq $_flag_sat_cycles -verify -prove-asserts -set-init-zero -show-public \
+                     -dump_vcd $build_dir/$_flag_name/fail.vcd $_flag_reset_constraints
 "
 
 # Step 3: Execute Yosys

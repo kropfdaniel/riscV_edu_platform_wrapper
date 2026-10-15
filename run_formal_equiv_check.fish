@@ -86,6 +86,26 @@ function test_aligner
         --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_aligner.v
 end
 
+function test_decode
+    echo "--- Running Decode Suite ---"
+
+    for pre_register in true false
+        for mdu in true false
+            # Create a unique name for this specific combination
+            set -l test_name "serv_decode_pre_register_"$pre_register"_mdu_"$mdu
+            echo "-> Testing configuration: $test_name"
+            
+            check_equiv \
+                --name "$test_name" \
+                --top "serv_decode" \
+                --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_decode.vhdl \
+                --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_decode.v \
+                --generic "PRE_REGISTER=$pre_register" \
+                --generic "MDU=$mdu"
+        end
+    end
+end
+
 # ==============================================================================
 # 4. Argument Parsing & Execution
 # ==============================================================================
@@ -105,13 +125,16 @@ switch $suite
         test_compdec
     case "aligner"
         test_aligner
+    case "decode"
+        test_decode
     case "all"
         test_immdec
         test_compdec
         test_aligner
+        test_decode
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec, aligner"
+        echo "Available suites: all, immdec, compdec, aligner, decode"
         exit 1
 end
 
