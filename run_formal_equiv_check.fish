@@ -144,6 +144,7 @@ function test_bufreg
                 --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_bufreg.v \
                 --generic "MDU=$mdu" \
                 --generic "W=$W" \
+                --sat_cycles 40 \
                 --strict
         end
     end
@@ -163,7 +164,29 @@ function test_bufreg2
             --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_bufreg2.vhdl \
             --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_bufreg2.v \
             --generic "W=$W" \
+            --sat_cycles 40 \
             --strict
+    end
+end
+
+function test_csr
+    echo "--- Running CSR Suite ---"
+
+    for RESET_STRATEGY in MINI NONE
+        for W in 1 4
+            # Create a unique name for this specific combination
+            set -l test_name "serv_csr_RESET_STRATEGY_"$RESET_STRATEGY"_W_"$W
+            echo "-> Testing configuration: $test_name"
+            
+            check_equiv \
+                --name "$test_name" \
+                --top "serv_csr" \
+                --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_csr.vhdl \
+                --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_csr.v \
+                --generic "RESET_STRATEGY=$RESET_STRATEGY" \
+                --generic "W=$W" \
+                --sat_cycles 40
+        end
     end
 end
 
@@ -194,6 +217,8 @@ switch $suite
         test_bufreg
     case "bufreg2"
         test_bufreg2
+    case "csr"
+        test_csr
     case "all"
         test_immdec
         test_compdec
@@ -202,9 +227,10 @@ switch $suite
         test_alu
         test_bufreg
         test_bufreg2
+        test_csr
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2"
+        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr"
         exit 1
 end
 

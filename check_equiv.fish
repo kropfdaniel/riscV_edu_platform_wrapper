@@ -61,6 +61,9 @@ for generic_value in $_flag_generic
         set verilog_value 1
     else if test "$verilog_value" = false
         set verilog_value 0
+    else if not string match -q -r '^[0-9]+$' -- "$verilog_value"
+        # If it's not a pure number, wrap it in escaped quotes for Yosys
+        set verilog_value "\"$verilog_value\""
     end
     set verilog_chparam "$verilog_chparam chparam -set $parameter[1] $verilog_value gold;"
 end
