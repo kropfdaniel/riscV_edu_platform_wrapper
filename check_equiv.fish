@@ -53,19 +53,44 @@ set -l vhdl_generic_args
 set -l verilog_chparam ""
 
 for generic_value in $_flag_generic
-    set -a vhdl_generic_args "-g$generic_value"
-    set -l parameter (string split '=' -- $generic_value)
-    set -l verilog_value $parameter[2]
+    # Split at the first '=' to separate NAME from the rest
+    set -l parameter (string split -m 1 '=' -- $generic_value)
+    set -l generic_name $parameter[1]
+    set -l generic_val $parameter[2]
     
-    if test "$verilog_value" = true
-        set verilog_value 1
-    else if test "$verilog_value" = false
-        set verilog_value 0
-    else if not string match -q -r '^[0-9]+$' -- "$verilog_value"
-        # If it's not a pure number, wrap it in escaped quotes for Yosys
-        set verilog_value "\"$verilog_value\""
+    # Check if the user explicitly provided a bit width (e.g., 32:x"000000FF")
+    if string match -q '*:*' -- $generic_val
+        set -l val_parts (string split -m 1 ':' -- $generic_val)
+        set -l bit_width $val_parts[1]
+        set -l vhdl_literal $val_parts[2]
+        
+        # Strip the x"..." wrapper
+        if string match -rq '^x".*"$' -- $vhdl_literal
+            set -l hex_str (string replace -r '^x"(.*)"$' '$1' -- $vhdl_literal)
+            
+            # Convert hex string to binary for GHDL (GHDL requires literal binary strings)
+            set -l bin_str (echo $hex_str | sed 's/0/0000/g; s/1/0001/g; s/2/0010/g; s/3/0011/g; s/4/0100/g; s/5/0101/g; s/6/0110/g; s/7/0111/g; s/8/1000/g; s/9/1001/g; s/a/1010/g; s/b/1011/g; s/c/1100/g; s/d/1101/g; s/e/1110/g; s/f/1111/g; s/A/1010/g; s/B/1011/g; s/C/1100/g; s/D/1101/g; s/E/1110/g; s/F/1111/g')
+            
+            # Pass the binary string explicitly wrapped in escaped double quotes to GHDL
+            set -a vhdl_generic_args "-g$generic_name=$bin_str"
+            
+            # Pass the standard hex format to Yosys
+            set verilog_chparam "$verilog_chparam chparam -set $generic_name $bit_width'h$hex_str gold;"
+        end
+    else
+        # Standard path for integers and booleans (no colon used)
+        set -a vhdl_generic_args "-g$generic_name=$generic_val"
+        set -l verilog_value $generic_val
+        if test "$verilog_value" = true
+            set verilog_value 1
+        else if test "$verilog_value" = false
+            set verilog_value 0
+        else if not string match -q -r '^[0-9]+$' -- "$verilog_value"
+            # If it's not a pure number, wrap it in escaped quotes for Yosys
+            set verilog_value "\"$verilog_value\""
+        end
+        set verilog_chparam "$verilog_chparam chparam -set $parameter[1] $verilog_value gold;"
     end
-    set verilog_chparam "$verilog_chparam chparam -set $parameter[1] $verilog_value gold;"
 end
 
 set -l verilog_include ""

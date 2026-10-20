@@ -54,7 +54,7 @@ function test_immdec
         for w in 1 4
             
             # Create a unique name for this specific combination
-            set -l test_name "serv_immdec_shared_"$shared"_w_"$w
+            set -l test_name "serv_immdec/shared_"$shared"_w_"$w
             echo "-> Testing configuration: $test_name"
             
             check_equiv \
@@ -95,7 +95,7 @@ function test_decode
     for pre_register in true false
         for mdu in true false
             # Create a unique name for this specific combination
-            set -l test_name "serv_decode_pre_register_"$pre_register"_mdu_"$mdu
+            set -l test_name "serv_decode/pre_register_"$pre_register"_mdu_"$mdu
             echo "-> Testing configuration: $test_name"
             
             check_equiv \
@@ -115,7 +115,7 @@ function test_alu
 
     for W in 1 2 4 32
         # Create a unique name for this specific combination
-        set -l test_name "serv_alu_W_"$W
+        set -l test_name "serv_alu/W_"$W
         echo "-> Testing configuration: $test_name"
         
         check_equiv \
@@ -134,7 +134,7 @@ function test_bufreg
     for mdu in true false
         for W in 1 4
             # Create a unique name for this specific combination
-            set -l test_name "serv_bufreg_mdu_"$mdu"_w_"$W
+            set -l test_name "serv_bufreg/mdu_"$mdu"_w_"$W
             echo "-> Testing configuration: $test_name"
             
             check_equiv \
@@ -155,7 +155,7 @@ function test_bufreg2
 
     for W in 1 4
         # Create a unique name for this specific combination
-        set -l test_name "serv_bufreg2_W_"$W
+        set -l test_name "serv_bufreg2/W_"$W
         echo "-> Testing configuration: $test_name"
         
         check_equiv \
@@ -175,7 +175,7 @@ function test_csr
     for RESET_STRATEGY in MINI NONE
         for W in 1 4
             # Create a unique name for this specific combination
-            set -l test_name "serv_csr_RESET_STRATEGY_"$RESET_STRATEGY"_W_"$W
+            set -l test_name "serv_csr/RESET_STRATEGY_"$RESET_STRATEGY"_W_"$W
             echo "-> Testing configuration: $test_name"
             
             check_equiv \
@@ -185,7 +185,35 @@ function test_csr
                 --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_csr.v \
                 --generic "RESET_STRATEGY=$RESET_STRATEGY" \
                 --generic "W=$W" \
-                --sat_cycles 40
+                --sat_cycles 20
+        end
+    end
+end
+
+function test_ctrl
+    echo "--- Running Ctrl Suite ---"
+
+    for RESET_STRATEGY in MINI NONE
+        for RESET_PC in '32:x"00000000"' '32:x"00000004"' '32:x"A5A55A5A"' '32:x"FFFFFFFF"'
+            for WITH_CSR in true false
+                for W in 1 4
+                    # Strip colons and double quotes to create a safe folder name
+                    set -l clean_pc (string replace -a '"' '' -- $RESET_PC | string replace -a ':' '_')
+                    set -l test_name "serv_ctrl/RST_"$RESET_STRATEGY"_RESET_PC_"$clean_pc"_CSR_"$WITH_CSR"_W_"$W
+                    echo "-> Testing configuration: $test_name"
+                    
+                    check_equiv \
+                        --name "$test_name" \
+                        --top "serv_ctrl" \
+                        --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_ctrl.vhdl \
+                        --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_ctrl.v \
+                        --generic "RESET_STRATEGY=$RESET_STRATEGY" \
+                        --generic "RESET_PC=$RESET_PC" \
+                        --generic "WITH_CSR=$WITH_CSR" \
+                        --generic "W=$W" \
+                        --sat_cycles 20
+                end
+            end 
         end
     end
 end
@@ -219,6 +247,8 @@ switch $suite
         test_bufreg2
     case "csr"
         test_csr
+    case "ctrl"
+        test_ctrl
     case "all"
         test_immdec
         test_compdec
@@ -228,9 +258,10 @@ switch $suite
         test_bufreg
         test_bufreg2
         test_csr
+        test_ctrl
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr"
+        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl"
         exit 1
 end
 
