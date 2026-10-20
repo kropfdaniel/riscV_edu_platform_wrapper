@@ -218,6 +218,27 @@ function test_ctrl
     end
 end
 
+function test_mem_if
+    echo "--- Running Mem If Suite ---"
+
+    for WITH_CSR in true false
+        for W in 1 2 4 8 16 32
+            # Create a unique name for this specific combination
+            set -l test_name "serv_mem_if/WITH_CSR_"$WITH_CSR"_W_"$W
+            echo "-> Testing configuration: $test_name"
+            
+            check_equiv \
+                --name "$test_name" \
+                --top "serv_mem_if" \
+                --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_mem_if.vhdl \
+                --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_mem_if.v \
+                --generic "WITH_CSR=$WITH_CSR" \
+                --generic "W=$W" \
+                --sat_cycles 20
+        end
+    end
+end
+
 # ==============================================================================
 # 4. Argument Parsing & Execution
 # ==============================================================================
@@ -249,6 +270,8 @@ switch $suite
         test_csr
     case "ctrl"
         test_ctrl
+    case "mem_if"
+        test_mem_if
     case "all"
         test_immdec
         test_compdec
@@ -259,9 +282,10 @@ switch $suite
         test_bufreg2
         test_csr
         test_ctrl
+        test_mem_if
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl"
+        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl, mem_if"
         exit 1
 end
 
