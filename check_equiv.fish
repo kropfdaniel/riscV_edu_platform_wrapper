@@ -16,6 +16,7 @@
 # Optional Arguments:
 #   --generic           Set VHDL generics and Verilog parameters (Format: NAME=VALUE).
 #                       Can specify multiple times (e.g., --generic "W=1" --generic "SHARED=true").
+#                       To specify a bit width for a hex literal, use the format NAME=WIDTH:VALUE (e.g., --generic "W=32:x"000000FF").
 #   --sat_cycles        Number of cycles for the Yosys SAT solver to prove (Default: 12).
 #   --v_include         Include directory for Verilog headers.
 #   --blackbox          Verilog file containing stub modules to blackbox.

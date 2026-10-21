@@ -194,7 +194,7 @@ function test_ctrl
     echo "--- Running Ctrl Suite ---"
 
     for RESET_STRATEGY in MINI NONE
-        for RESET_PC in '32:x"00000000"' '32:x"00000004"' '32:x"A5A55A5A"' '32:x"FFFFFFFF"'
+        for RESET_PC in 32:x"00000000" 32:x"00000004" 32:x"A5A55A5A" 32:x"FFFFFFFF"
             for WITH_CSR in true false
                 for W in 1 4
                     # Strip colons and double quotes to create a safe folder name
