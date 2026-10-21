@@ -299,6 +299,32 @@ function test_state
     end
 end
 
+function test_rf_if
+    echo "--- Running RF_IF Suite ---"
+
+    for WITH_CSR in true false
+        for W in 1 2 4 8 16 32
+            # Create a unique name for this specific combination
+            set -l test_name "serv_rf_if/WITH_CSR_"$WITH_CSR"_W_"$W
+            echo "-> Testing configuration: $test_name"
+            
+            if not check_equiv \
+                    --name "$test_name" \
+                    --top "serv_rf_if" \
+                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_rf_if.vhdl \
+                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_pkg.vhdl \
+                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_rf_if.v \
+                    --generic "WITH_CSR=$WITH_CSR" \
+                    --generic "W=$W" \
+                    --sat_cycles 20 \
+                    --strict
+                echo "FATAL: $test_name failed! Halting execution."
+                exit 1
+            end
+        end
+    end
+end
+
 # ==============================================================================
 # 4. Argument Parsing & Execution
 # ==============================================================================
@@ -334,6 +360,8 @@ switch $suite
         test_mem_if
     case "state"
         test_state
+    case "rf_if"
+        test_rf_if
     case "all"
         test_immdec
         test_compdec
@@ -346,9 +374,10 @@ switch $suite
         test_ctrl
         test_mem_if
         test_state
+        test_rf_if
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl, mem_if, state"
+        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl, mem_if, state, rf_if"
         exit 1
 end
 
