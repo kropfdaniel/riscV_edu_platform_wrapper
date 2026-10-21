@@ -1,3 +1,23 @@
+#!/usr/bin/env python3
+# ==============================================================================
+# File: compare_vcd.py
+# Author: Daniel Kropf
+# License: MIT License
+# 
+# Description: Parses VCD and Yosys synthesis log files to compare gate-level 
+#              and gold-level Verilog/VHDL signals. Tracks timestamps to report 
+#              the exact clock cycle where signals first diverge, filtering out 
+#              unmapped internal nets.
+#
+# Usage: 
+#   python compare_vcd.py <file.vcd> [synthesis.log] [--debug]
+#
+# Arguments:
+#   <file.vcd>          Path to the VCD waveform dump file.
+#   [synthesis.log]     (Optional) Yosys log file to map obfuscated nXXX nets.
+#   --debug             Prints detailed signal comparison steps per timestamp.
+# ==============================================================================
+
 import sys
 import re
 
