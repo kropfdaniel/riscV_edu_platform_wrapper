@@ -144,22 +144,17 @@ set -l yosys_script "
     equiv_make -make_assert gold silver equiv
     prep -top equiv
     flatten; async2sync; opt -keepdc
-    sat $sat_options -seq $_flag_sat_cycles -verify -prove-asserts -set-init-zero -show-public \
+    sat $sat_options -seq $_flag_sat_cycles -verify -prove-asserts -set-init-zero \
                      -dump_vcd $build_dir/$_flag_name/fail.vcd $_flag_reset_constraints
 "
 
 # Step 3: Execute Yosys
 if not yosys -p "$yosys_script" >>$log_file 2>&1
-    printf '%s,equivalence-failed\n' $_flag_name >> $results_file
-    printf 'Reset-constrained equivalence failed: %s\n' $_flag_name | tee -a $log_file
-
-    echo "--- YOSYS ERROR LOG ---"
-    cat $log_file
-    echo "-----------------------"
-
+    printf '❌ %s,equivalence-failed\n' $_flag_name >> $results_file
+    printf '❌ Reset-constrained equivalence failed: %s\n' $_flag_name | tee -a $log_file
     return 1
 end
 
-printf '%s,proven\n' $_flag_name >> $results_file
-printf 'Reset-constrained proof: %s\n' $_flag_name | tee -a $log_file
+printf '✅ %s,proven\n' $_flag_name >> $results_file
+printf '✅ Reset-constrained proof: %s\n' $_flag_name | tee -a $log_file
 return 0
