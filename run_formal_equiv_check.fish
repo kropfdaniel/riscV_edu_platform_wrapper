@@ -325,6 +325,33 @@ function test_rf_if
     end
 end
 
+function test_rf_ram
+    echo "--- Running RF_RAM Suite ---"
+
+    for WIDTH in 2 4 8 16 32
+        for CSR_REGS in 0 4
+            # Create a unique name for this specific combination
+            set -l test_name "serv_rf_ram/WIDTH_"$WIDTH"_CSR_REGS_"$CSR_REGS
+            echo "-> Testing configuration: $test_name"
+            
+            if not check_equiv \
+                    --name "$test_name" \
+                    --top "serv_rf_ram" \
+                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_rf_ram.vhdl \
+                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_pkg.vhdl \
+                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_rf_ram.v \
+                    --generic "width=$WIDTH" \
+                    --generic "csr_regs=$CSR_REGS" \
+                    --define "SERV_CLEAR_RAM" \
+                    --sat_cycles 20 \
+                    --strict
+                echo "FATAL: $test_name failed! Halting execution."
+                exit 1
+            end
+        end
+    end
+end
+
 # ==============================================================================
 # 4. Argument Parsing & Execution
 # ==============================================================================
@@ -362,6 +389,8 @@ switch $suite
         test_state
     case "rf_if"
         test_rf_if
+    case "rf_ram"
+        test_rf_ram
     case "all"
         test_immdec
         test_compdec
@@ -375,9 +404,10 @@ switch $suite
         test_mem_if
         test_state
         test_rf_if
+        test_rf_ram
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl, mem_if, state, rf_if"
+        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl, mem_if, state, rf_if, rf_ram"
         exit 1
 end
 

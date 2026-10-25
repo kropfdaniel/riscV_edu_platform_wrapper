@@ -27,7 +27,7 @@
 
 # Parse named arguments
 argparse 'n/name=' 't/top=' 'vhdl=+' 'verilog=+' 'reset_constraints=' \
-         'v_include=' 'blackbox=' 'sat_cycles=' 'generic=+' 'strict' -- $argv
+         'v_include=' 'blackbox=' 'sat_cycles=' 'generic=+' 'define=+' 'strict' -- $argv
 or return 1
 
 # Assert global output variables exist
@@ -99,6 +99,13 @@ if set -q _flag_v_include
     set verilog_include "-I$_flag_v_include"
 end
 
+set -l verilog_defines ""
+if set -q _flag_define
+    for def in $_flag_define
+        set verilog_defines "$verilog_defines -D$def"
+    end
+end
+
 set -l vhdl_flags --synth --std=08
 if set -q _flag_strict
     set -a vhdl_flags -Wall
@@ -135,7 +142,7 @@ end
 # Step 2: Yosys Equivalence Checking Script
 set -l yosys_script "
     $blackbox_command
-    read_verilog -formal $verilog_include $_flag_verilog
+    read_verilog -formal $verilog_include $verilog_defines $_flag_verilog
     rename $_flag_top gold
     $verilog_chparam
     read_verilog -formal $silver_file
