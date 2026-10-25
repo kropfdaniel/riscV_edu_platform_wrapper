@@ -352,6 +352,46 @@ function test_rf_ram
     end
 end
 
+function test_rf_ram_if
+    echo "--- Running RF_RAM_IF Suite ---"
+
+    for RESET_STRATEGY in MINI NONE
+        for CSR_REGS in 0 4
+            for W in 1 4
+                # Create a safe list of widths that are >= W*2 and include 32
+                set -l valid_widths
+                if test "$W" = "1"
+                    set valid_widths 2 8 32
+                else if test "$W" = "4"
+                    set valid_widths 8 16 32
+                end
+
+                for width in $valid_widths
+                    # Create a unique name for this specific combination
+                    set -l test_name "serv_rf_ram_if/RST_"$RESET_STRATEGY"_CSR_"$CSR_REGS"_W_"$W"_WIDTH_"$width
+                    echo "-> Testing configuration: $test_name"
+                    
+                    if not check_equiv \
+                            --name "$test_name" \
+                            --top "serv_rf_ram_if" \
+                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_rf_ram_if.vhdl \
+                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_pkg.vhdl \
+                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_rf_ram_if.v \
+                            --generic "reset_strategy=$RESET_STRATEGY" \
+                            --generic "csr_regs=$CSR_REGS" \
+                            --generic "W=$W" \
+                            --generic "width=$width" \
+                            --sat_cycles 20 \
+                            --strict
+                        echo "FATAL: $test_name failed! Halting execution."
+                        exit 1
+                    end
+                end
+            end
+        end
+    end
+end
+
 # ==============================================================================
 # 4. Argument Parsing & Execution
 # ==============================================================================
@@ -391,6 +431,8 @@ switch $suite
         test_rf_if
     case "rf_ram"
         test_rf_ram
+    case "rf_ram_if"
+        test_rf_ram_if
     case "all"
         test_immdec
         test_compdec
@@ -405,9 +447,10 @@ switch $suite
         test_state
         test_rf_if
         test_rf_ram
+        test_rf_ram_if
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl, mem_if, state, rf_if, rf_ram"
+        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl, mem_if, state, rf_if, rf_ram, rf_ram_if"
         exit 1
 end
 
