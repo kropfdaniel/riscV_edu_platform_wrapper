@@ -399,58 +399,53 @@ function test_serv_top
         for W in 1 4
             for PRE_REGISTER in true false
                 for RESET_STRATEGY in MINI NONE
-                    for DEBUG in false # TODO add true
-                        for MDU in true false
-                            for COMPRESSED in true false
-                                for RISCV_FORMAL in false # TODO add true
-                                    # Create a unique name for this specific combination
-                                    set -l test_name "serv_top/WITH_CSR_"$WITH_CSR"_W_"$W"_PRE_REG_"$PRE_REGISTER"_RESET_STRAT_"$RESET_STRATEGY"_DEBUG_"$DEBUG"_MDU_"$MDU"_COMPRESSED_"$COMPRESSED"_RISCV_FORMAL_"$RISCV_FORMAL
-                                    echo "-> Testing configuration: $test_name"
-                                    
-                                    if not check_equiv \
-                                            --name "$test_name" \
-                                            --top "serv_top" \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_top.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_pkg.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_aligner.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_compdec.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_state.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_decode.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_immdec.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_bufreg.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_bufreg2.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_ctrl.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_alu.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_rf_if.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_mem_if.vhdl \
-                                            --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_csr.vhdl \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_top.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_aligner.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_compdec.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_state.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_decode.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_immdec.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_bufreg.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_bufreg2.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_ctrl.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_alu.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_rf_if.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_mem_if.v \
-                                            --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_csr.v \
-                                            --generic "WITH_CSR=$WITH_CSR" \
-                                            --generic "W=$W" \
-                                            --generic "PRE_REGISTER=$PRE_REGISTER" \
-                                            --generic "RESET_STRATEGY=$RESET_STRATEGY" \
-                                            --generic "DEBUG=$DEBUG" \
-                                            --generic "MDU=$MDU" \
-                                            --generic "COMPRESSED=$COMPRESSED" \
-                                            --define "SERV_CLEAR_RAM" \
-                                            --sat_cycles 12
-                                            # TODO --strict
-                                        echo "FATAL: $test_name failed! Halting execution."
-                                        exit 1
-                                    end
-                                end
+                    for MDU in true false
+                        for COMPRESSED in true false
+                            # Create a unique name for this specific combination
+                            set -l test_name "serv_top/WITH_CSR_"$WITH_CSR"_W_"$W"_PRE_REG_"$PRE_REGISTER"_RESET_STRAT_"$RESET_STRATEGY"_MDU_"$MDU"_COMPRESSED_"$COMPRESSED
+                            echo "-> Testing configuration: $test_name"
+                            
+                            if not check_equiv \
+                                    --name "$test_name" \
+                                    --top "serv_top" \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_top.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_pkg.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_aligner.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_compdec.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_state.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_decode.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_immdec.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_bufreg.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_bufreg2.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_ctrl.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_alu.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_rf_if.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_mem_if.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_csr.vhdl \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_top.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_aligner.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_compdec.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_state.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_decode.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_immdec.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_bufreg.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_bufreg2.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_ctrl.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_alu.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_rf_if.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_mem_if.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_csr.v \
+                                    --generic "WITH_CSR=$WITH_CSR" \
+                                    --generic "W=$W" \
+                                    --generic "PRE_REGISTER=$PRE_REGISTER" \
+                                    --generic "RESET_STRATEGY=$RESET_STRATEGY" \
+                                    --generic "MDU=$MDU" \
+                                    --generic "COMPRESSED=$COMPRESSED" \
+                                    --define "SERV_CLEAR_RAM" \
+                                    --sat_cycles 12 \
+                                    --strict
+                                echo "FATAL: $test_name failed! Halting execution."
+                                exit 1
                             end
                         end
                     end
@@ -458,6 +453,86 @@ function test_serv_top
             end
         end
     end
+end
+
+function test_serv_rf_top
+    echo "--- Running SERV_TOP Suite ---"
+
+    for WITH_CSR in true false
+        for W in 1 4
+            for PRE_REGISTER in true false
+                for RESET_STRATEGY in MINI NONE
+                    for MDU in true false
+                        for COMPRESSED in true false
+                            # Create a unique name for this specific combination
+                            set -l test_name "serv_rf_top/WITH_CSR_"$WITH_CSR"_W_"$W"_PRE_REG_"$PRE_REGISTER"_RESET_STRAT_"$RESET_STRATEGY"_MDU_"$MDU"_COMPRESSED_"$COMPRESSED
+                            echo "-> Testing configuration: $test_name"
+                            
+                            if not check_equiv \
+                                    --name "$test_name" \
+                                    --top "serv_top" \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_rf_top.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_top.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_pkg.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_aligner.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_compdec.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_state.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_decode.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_immdec.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_bufreg.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_bufreg2.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_ctrl.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_alu.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_rf_if.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_rf_ram.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_rf_ram_if.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_mem_if.vhdl \
+                                    --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/serv_csr.vhdl \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_rf_top.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_top.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_aligner.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_compdec.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_state.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_decode.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_immdec.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_bufreg.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_bufreg2.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_ctrl.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_alu.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_rf_if.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_rf_ram.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_rf_ram_if.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_mem_if.v \
+                                    --verilog riscV_edu_platform/hdl/modules/serv/verilog/serv_csr.v \
+                                    --generic "WITH_CSR=$WITH_CSR" \
+                                    --generic "W=$W" \
+                                    --generic "PRE_REGISTER=$PRE_REGISTER" \
+                                    --generic "RESET_STRATEGY=$RESET_STRATEGY" \
+                                    --generic "DEBUG=false" \
+                                    --generic "MDU=$MDU" \
+                                    --generic "COMPRESSED=$COMPRESSED" \
+                                    --define "SERV_CLEAR_RAM" \
+                                    --sat_cycles 12 \
+                                    --strict
+                                echo "FATAL: $test_name failed! Halting execution."
+                                exit 1
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+function test_servile_arbiter
+    echo "--- Running servile arbiter Suite ---"
+    check_equiv \
+        --name "servile_arbiter" \
+        --top "servile_arbiter" \
+        --vhdl riscV_edu_platform/hdl/modules/serv/vhdl/servile_arbiter.vhdl \
+        --verilog riscV_edu_platform/hdl/modules/serv/verilog/servile_arbiter.v  \
+        --strict
 end
 
 # ==============================================================================
@@ -503,6 +578,10 @@ switch $suite
         test_rf_ram_if
     case "serv_top"
         test_serv_top
+    case "serv_rf_top"
+        test_serv_rf_top
+    case "servile_arbiter"
+        test_servile_arbiter
     case "all"
         test_immdec
         test_compdec
@@ -519,9 +598,11 @@ switch $suite
         test_rf_ram
         test_rf_ram_if
         test_serv_top
+        test_serv_rf_top
+        test_servile_arbiter
     case '*'
         echo "Error: Unknown test suite '$suite'."
-        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl, mem_if, state, rf_if, rf_ram, rf_ram_if, serv_top"
+        echo "Available suites: all, immdec, compdec, aligner, decode, alu, bufreg, bufreg2, csr, ctrl, mem_if, state, rf_if, rf_ram, rf_ram_if, serv_top, serv_rf_top, servile_arbiter"
         exit 1
 end
 
